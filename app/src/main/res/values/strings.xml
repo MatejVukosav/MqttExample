@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MqttExample</string>
+    <string name="title_activity_internet_test">InternetTestActivity</string>
 </resources>

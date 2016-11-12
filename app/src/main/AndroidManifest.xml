@@ -25,13 +25,11 @@
 
         <service android:name="org.eclipse.paho.android.service.MqttService"/>
 
-        <receiver android:name=".InternetConnectionChangeBroadcast">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-                <action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>
-            </intent-filter>
-        </receiver>
-
+        <activity
+            android:name=".InternetTestActivity"
+            android:label="@string/title_activity_internet_test"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

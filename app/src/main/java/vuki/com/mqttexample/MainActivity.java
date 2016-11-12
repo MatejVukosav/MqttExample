@@ -1,8 +1,6 @@
 package vuki.com.mqttexample;
 
-import android.content.IntentFilter;
 import android.databinding.DataBindingUtil;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -22,24 +20,20 @@ public class MainActivity extends AppCompatActivity implements InternetConnectio
     ActivityMainBinding binding;
 
     MqttAndroidClient mqttAndroidClient;
-    String TAG = "mqttTest";
+    private static final String TAG = "mqttTest";
 
-    final String serverUri = "tcp://test.mosquitto.org:1883";
-    final String clientId = "MqttExample";
-    //    final String subscriptionTopic = "mqttExampleTopic";
-    final String subscriptionTopic = "temperatura";
-    final String publishTopic = "mqttExamplePublishTopic";
-
-    InternetConnectionChangeBroadcast internetConnectionChangeBroadcast = new InternetConnectionChangeBroadcast();
-    protected final IntentFilter mIntentFilter = new IntentFilter( ConnectivityManager.CONNECTIVITY_ACTION );
+    private static final String SERVER_URI = "tcp://test.mosquitto.org:1883";
+    private static final String CLIENT_ID = "MqttExample";
+    //    final String SUBSCRIPTION_TOPIC = "mqttExampleTopic";
+    private static final String SUBSCRIPTION_TOPIC = "temperatura";
+    private static final String PUBLIS_TOPIC = "mqttExamplePublishTopic";
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         binding = DataBindingUtil.setContentView( this, R.layout.activity_main );
 
-        registerReceiver( internetConnectionChangeBroadcast, mIntentFilter );
-        internetConnectionChangeBroadcast.addListener( this );
+        InternetConnectionChangeBroadcast.getInstance().addListener( this, this, null );
 
         init();
         initListeners();
@@ -59,14 +53,13 @@ public class MainActivity extends AppCompatActivity implements InternetConnectio
 
     @Override
     protected void onDestroy() {
-        unregisterReceiver( internetConnectionChangeBroadcast );
-        internetConnectionChangeBroadcast.removeListener( this );
+        InternetConnectionChangeBroadcast.getInstance().removeListener( this, this );
         super.onDestroy();
     }
 
     private void init() {
         setSupportActionBar( binding.toolbar );
-        mqttAndroidClient = new MqttAndroidClient( getApplicationContext(), serverUri, clientId );
+        mqttAndroidClient = new MqttAndroidClient( getApplicationContext(), SERVER_URI, CLIENT_ID );
     }
 
     private void initListeners() {
@@ -136,11 +129,11 @@ public class MainActivity extends AppCompatActivity implements InternetConnectio
 
     public void subscribeToTopic() {
         try {
-            mqttAndroidClient.subscribe( subscriptionTopic, 0, null, new IMqttActionListener() {
+            mqttAndroidClient.subscribe( SUBSCRIPTION_TOPIC, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess( IMqttToken asyncActionToken ) {
                     Log.d( TAG, "Success subscription to topic" );
-                    binding.btnSubscribe.setText( "Subscribed to topic: " + subscriptionTopic );
+                    binding.btnSubscribe.setText( "Subscribed to topic: " + SUBSCRIPTION_TOPIC );
                 }
 
                 @Override
@@ -160,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements InternetConnectio
         String temperature = binding.editTemperature.getText().toString();
         message.setPayload( temperature.getBytes() );
         try {
-            mqttAndroidClient.publish( publishTopic, message );
+            mqttAndroidClient.publish( PUBLIS_TOPIC, message );
         } catch( MqttException e ) {
             e.printStackTrace();
         }
